@@ -15,4 +15,4 @@ After that, you need to build the program, and it can be used.
 
 ### How to build
 
-To build the bot, you need to install Go from the website https://go.dev/dl/, clone the repository, navigate to the repository folder, and execute the command `go build -o chat cmd/chat/main.go`. After that, you can run the binary file that was generated during the build from the command line.
+To build the bot, you need to install Go from the website https://go.dev/dl/, clone the repository, navigate to the repository folder, and execute the command `go build -o chat cmd/chat/main.go`. After that, you can run the binary file that was generated during the build from the command line: `chmod + x chat && ./chat`

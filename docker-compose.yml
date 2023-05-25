@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  app:
+    container_name: go-chat-tg
+    build:
+      context: .
+    env_file:
+      - cmd/chat/.env

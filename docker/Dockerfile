@@ -3,9 +3,9 @@ FROM golang:1.19-alpine
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 WORKDIR /app
-COPY go.mod go.sum ./
+COPY ../go.mod go.sum ./
 RUN go mod download
-COPY . .
+COPY .. .
 RUN go build -o chat cmd/chat/main.go
 RUN cp cmd/chat/.env .env
 CMD ["./chat"]

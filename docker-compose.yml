@@ -4,5 +4,6 @@ services:
     container_name: go-chat-tg
     build:
       context: .
+      dockerfile: docker/Dockerfile
     env_file:
       - cmd/chat/.env

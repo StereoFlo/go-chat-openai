@@ -40,11 +40,20 @@ func (ms *MainService) MessageHandler(update tgV5.Update) {
 	}
 	res, err := ms.chatBot.Ask(user.Messages)
 	if err != nil {
+		errStr := err.Error()
+		ms.wg.Add(1)
+		go ms.tgBot.Send(update.Message.Chat.ID, &errStr, user)
 		log.Fatal(err)
 	}
 	ms.userService.AddAiMessage(user.UserId, res)
+	if 4096 <= len(*res) { //todo make constant instead
+		messages := ms.splitString(*res, 4096)
+		ms.wg.Add(1)
+		go ms.tgBot.SendMany(update.Message.Chat.ID, messages, user)
+		return
+	}
 	ms.wg.Add(1)
-	go ms.tgBot.SendMessage(update.Message.Chat.ID, res, user)
+	go ms.tgBot.Send(update.Message.Chat.ID, res, user)
 }
 
 func (ms *MainService) HistoryHandler(update tgV5.Update) {
@@ -54,7 +63,7 @@ func (ms *MainService) HistoryHandler(update tgV5.Update) {
 	}
 	ms.wg.Add(1)
 	_, user := ms.userService.GetUserById(update.Message.From.ID)
-	go ms.tgBot.SendMessage(update.Message.Chat.ID, &history, user)
+	go ms.tgBot.Send(update.Message.Chat.ID, &history, user)
 }
 
 func (ms *MainService) ClearHistoryHandler(update tgV5.Update) {
@@ -67,7 +76,7 @@ func (ms *MainService) ClearHistoryHandler(update tgV5.Update) {
 	}
 	ms.userService.ClearHistory(update.Message.From.ID)
 	ms.wg.Add(1)
-	go ms.tgBot.SendMessage(update.Message.Chat.ID, &m, user)
+	go ms.tgBot.Send(update.Message.Chat.ID, &m, user)
 }
 
 func (ms *MainService) StartHandler(update tgV5.Update) {
@@ -80,5 +89,27 @@ func (ms *MainService) StartHandler(update tgV5.Update) {
 	}
 	user.Messages = nil
 	ms.wg.Add(1)
-	go ms.tgBot.SendMessage(update.Message.Chat.ID, res, nil)
+	go ms.tgBot.Send(update.Message.Chat.ID, res, nil)
+}
+
+func (ms *MainService) splitString(s string, chunkSize int) []string {
+	if len(s) == 0 {
+		return nil
+	}
+	if chunkSize >= len(s) {
+		return []string{s}
+	}
+	var chunks = make([]string, 0, (len(s)-1)/chunkSize+1)
+	currentLen := 0
+	currentStart := 0
+	for i := range s {
+		if currentLen == chunkSize {
+			chunks = append(chunks, s[currentStart:i])
+			currentLen = 0
+			currentStart = i
+		}
+		currentLen++
+	}
+	chunks = append(chunks, s[currentStart:])
+	return chunks
 }

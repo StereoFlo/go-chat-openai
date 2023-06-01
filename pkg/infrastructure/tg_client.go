@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type TelegramClient struct {
@@ -44,7 +45,7 @@ func (tc *TelegramClient) GetUpdates() tgV5.UpdatesChannel {
 	return tc.bot.GetUpdatesChan(update)
 }
 
-func (tc *TelegramClient) SendMessage(userId int64, message *string, userMessage *entity.User) {
+func (tc *TelegramClient) Send(userId int64, message *string, userMessage *entity.User) {
 	defer tc.wg.Done()
 	msg := tc.newMessage(userId, *message)
 	var lens string
@@ -57,6 +58,25 @@ func (tc *TelegramClient) SendMessage(userId int64, message *string, userMessage
 	_, err := tc.bot.Send(msg)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func (tc *TelegramClient) SendMany(userId int64, messages []string, userMessage *entity.User) {
+	defer tc.wg.Done()
+	for _, message := range messages {
+		msg := tc.newMessage(userId, message)
+		var lens string
+		if nil == userMessage || nil == userMessage.Messages {
+			lens = "0"
+		} else {
+			lens = strconv.Itoa(len(userMessage.Messages))
+		}
+		tc.setKeyBoard(&msg, lens)
+		_, err := tc.bot.Send(msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		time.Sleep(5)
 	}
 }
 

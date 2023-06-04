@@ -36,8 +36,8 @@ func (us *UserService) GetUserById(userId int64) (int, *entity.User) {
 			return k, v
 		}
 	}
-
-	return 0, nil
+	user := us.registerUser(userId)
+	return 0, user
 }
 
 func (us *UserService) AddUserMessage(userId int64, message *string) {

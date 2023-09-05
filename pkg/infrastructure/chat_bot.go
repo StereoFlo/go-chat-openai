@@ -2,8 +2,8 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"github.com/sashabaranov/go-openai"
-	"log"
 	"sync"
 )
 
@@ -47,15 +47,19 @@ func NewChatBot(apiKey string, model string, wg *sync.WaitGroup) *ChatBot {
 
 func (c *ChatBot) Ask(messages []openai.ChatCompletionMessage) (*string, error) {
 	completionChan := make(chan openai.ChatCompletionResponse)
+	errorsChan := make(chan error)
 	c.wg.Add(1)
-	go c.getCompletionResponse(messages, completionChan, c.wg)
+	go c.getCompletionResponse(messages, completionChan, errorsChan, c.wg)
+	if <-errorsChan != nil {
+		return nil, errors.New("was an error")
+	}
 	resp := <-completionChan
 	content := resp.Choices[0].Message.Content
 
 	return &content, nil
 }
 
-func (c *ChatBot) getCompletionResponse(messages []openai.ChatCompletionMessage, ch chan openai.ChatCompletionResponse, wg *sync.WaitGroup) {
+func (c *ChatBot) getCompletionResponse(messages []openai.ChatCompletionMessage, ch chan openai.ChatCompletionResponse, errCh chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
@@ -66,7 +70,8 @@ func (c *ChatBot) getCompletionResponse(messages []openai.ChatCompletionMessage,
 	)
 
 	if err != nil {
-		log.Fatalf("ChatCompletion error: %v\n", err)
+		errCh <- err
+		return
 	}
 	ch <- resp
 }

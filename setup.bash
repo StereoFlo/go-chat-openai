@@ -5,5 +5,5 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-cp ./go-chat-tg.service /etc/systemd/system/go-tg-bot.service
+cp ./go-tg-bot.service /etc/systemd/system/go-tg-bot.service
 systemctl daemon-reload

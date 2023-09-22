@@ -46,21 +46,18 @@ func NewChatBot(apiKey string, model string, wg *sync.WaitGroup) *ChatBot {
 }
 
 func (c *ChatBot) Ask(messages []openai.ChatCompletionMessage) (*string, error) {
-	completionChan := make(chan openai.ChatCompletionResponse)
-	errorsChan := make(chan error)
 	c.wg.Add(1)
-	go c.getCompletionResponse(messages, completionChan, errorsChan, c.wg)
-	if <-errorsChan != nil {
+	resp, err := c.getCompletionResponse(messages)
+	if err != nil {
 		return nil, errors.New("was an error")
 	}
-	resp := <-completionChan
+
 	content := resp.Choices[0].Message.Content
 
 	return &content, nil
 }
 
-func (c *ChatBot) getCompletionResponse(messages []openai.ChatCompletionMessage, ch chan openai.ChatCompletionResponse, errCh chan error, wg *sync.WaitGroup) {
-	defer wg.Done()
+func (c *ChatBot) getCompletionResponse(messages []openai.ChatCompletionMessage) (*openai.ChatCompletionResponse, error) {
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -70,8 +67,7 @@ func (c *ChatBot) getCompletionResponse(messages []openai.ChatCompletionMessage,
 	)
 
 	if err != nil {
-		errCh <- err
-		return
+		return nil, err
 	}
-	ch <- resp
+	return &resp, nil
 }

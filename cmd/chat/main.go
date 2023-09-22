@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
 	"go-chat-tg/pkg/entity"
 	"go-chat-tg/pkg/infrastructure"
 	service2 "go-chat-tg/pkg/service"
@@ -14,13 +13,11 @@ import (
 var historyBtnLabel = "History (%s)"
 var clearHistoryBtnLabel = "Clear history"
 
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalln("no env gotten")
-	}
-}
-
 func main() {
+	if os.Getenv("OPENAI_API_KEY") == "" || os.Getenv("AI_MODEL") == "" || os.Getenv("TELEGRAM_API_KEY") == "" || os.Getenv("WELCOME_MESSAGE") == "" {
+		log.Fatal("Something wrong with parameters")
+	}
+
 	var wg sync.WaitGroup
 	users := make([]*entity.User, 0)
 	userService := service2.NewUserService(users)

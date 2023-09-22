@@ -1,9 +1,11 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"go-chat-tg/pkg/entity"
 	"go-chat-tg/pkg/infrastructure"
 	service2 "go-chat-tg/pkg/service"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -13,9 +15,9 @@ var historyBtnLabel = "History (%s)"
 var clearHistoryBtnLabel = "Clear history"
 
 func init() {
-	//if err := godotenv.Load(); err != nil {
-	//	log.Fatalln("no env gotten")
-	//}
+	if err := godotenv.Load(); err != nil {
+		log.Fatalln("no env gotten")
+	}
 }
 
 func main() {

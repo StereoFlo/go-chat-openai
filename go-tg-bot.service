@@ -1,10 +1,10 @@
 [Unit]
-Description=go-chat-tg
+Description=go-tg-bot
 StartLimitBurst=2
 StartLimitIntervalSec=15
 
 [Service]
-ExecStart=go-chat-bot
+ExecStart=go-tg-bot
 StandardOutput=journal
 StandardError=journal
 #

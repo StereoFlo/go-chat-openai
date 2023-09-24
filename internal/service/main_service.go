@@ -3,22 +3,23 @@ package service
 import (
 	"fmt"
 	tgV5 "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"go-chat-tg/pkg/infrastructure"
+	"go-chat-tg/pkg/openai"
+	"go-chat-tg/pkg/telegram"
 	"log"
 	"sync"
 )
 
 type MainService struct {
-	chatBot       *infrastructure.ChatBot
+	chatBot       *openai.ChatBot
 	chatBotApiKey string
-	tgBot         *infrastructure.TelegramClient
+	tgBot         *telegram.TelegramClient
 	wg            *sync.WaitGroup
 	userService   *UserService
 }
 
 func NewMainService(
-	chatBot *infrastructure.ChatBot,
-	tgBot *infrastructure.TelegramClient,
+	chatBot *openai.ChatBot,
+	tgBot *telegram.TelegramClient,
 	wg *sync.WaitGroup,
 	userMessages *UserService) *MainService {
 	return &MainService{

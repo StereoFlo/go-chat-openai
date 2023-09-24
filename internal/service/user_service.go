@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/sashabaranov/go-openai"
-	"go-chat-tg/pkg/entity"
+	"go-chat-tg/internal/entity"
 	"time"
 )
 

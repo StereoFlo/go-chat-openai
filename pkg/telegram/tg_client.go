@@ -1,9 +1,9 @@
-package infrastructure
+package telegram
 
 import (
 	"fmt"
 	tgV5 "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"go-chat-tg/pkg/entity"
+	"go-chat-tg/internal/entity"
 	"log"
 	"strconv"
 	"sync"

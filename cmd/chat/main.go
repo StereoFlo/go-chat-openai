@@ -1,9 +1,10 @@
 package main
 
 import (
-	"go-chat-tg/pkg/entity"
-	"go-chat-tg/pkg/infrastructure"
-	service2 "go-chat-tg/pkg/service"
+	"go-chat-tg/internal/entity"
+	service2 "go-chat-tg/internal/service"
+	"go-chat-tg/pkg/openai"
+	"go-chat-tg/pkg/telegram"
 	"log"
 	"os"
 	"strings"
@@ -19,8 +20,8 @@ func main() {
 	var wg sync.WaitGroup
 	users := make([]*entity.User, 0)
 	userService := service2.NewUserService(users)
-	chatBot := infrastructure.NewChatBot(os.Getenv("OPENAI_API_KEY"), os.Getenv("AI_MODEL"), &wg)
-	tgBot := infrastructure.NewTelegramClient(os.Getenv("TELEGRAM_API_KEY"), os.Getenv("WELCOME_MESSAGE"), historyBtnLabel, clearHistoryBtnLabel, &wg)
+	chatBot := openai.NewChatBot(os.Getenv("OPENAI_API_KEY"), os.Getenv("AI_MODEL"), &wg)
+	tgBot := telegram.NewTelegramClient(os.Getenv("TELEGRAM_API_KEY"), os.Getenv("WELCOME_MESSAGE"), historyBtnLabel, clearHistoryBtnLabel, &wg)
 	service := service2.NewMainService(chatBot, tgBot, &wg, userService)
 	updates := tgBot.GetUpdates()
 	for update := range updates {

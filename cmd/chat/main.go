@@ -14,9 +14,7 @@ var historyBtnLabel = "History (%s)"
 var clearHistoryBtnLabel = "Clear history"
 
 func main() {
-	if os.Getenv("OPENAI_API_KEY") == "" || os.Getenv("AI_MODEL") == "" || os.Getenv("TELEGRAM_API_KEY") == "" || os.Getenv("WELCOME_MESSAGE") == "" {
-		log.Fatal("Something wrong with parameters")
-	}
+	checkEnvironment()
 
 	var wg sync.WaitGroup
 	users := make([]*entity.User, 0)
@@ -33,7 +31,7 @@ func main() {
 		case update.Message.Text == "/start":
 			service.StartHandler(update)
 			continue
-		case strings.HasPrefix(update.Message.Text, "Clear history"):
+		case strings.HasPrefix(update.Message.Text, clearHistoryBtnLabel):
 			service.ClearHistoryHandler(update)
 			continue
 		case strings.HasPrefix(update.Message.Text, "History"):
@@ -42,6 +40,12 @@ func main() {
 		default:
 			service.MessageHandler(update)
 		}
-		wg.Wait()
+	}
+	wg.Wait()
+}
+
+func checkEnvironment() {
+	if os.Getenv("OPENAI_API_KEY") == "" || os.Getenv("AI_MODEL") == "" || os.Getenv("TELEGRAM_API_KEY") == "" || os.Getenv("WELCOME_MESSAGE") == "" {
+		log.Fatal("Something wrong with parameters")
 	}
 }

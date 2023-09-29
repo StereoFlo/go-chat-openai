@@ -6,6 +6,6 @@ WORKDIR /app
 COPY ../go.mod go.sum ./
 RUN go mod download
 COPY .. .
-RUN go build -o chat cmd/chat/main.go
+RUN go build -ldflags '-w -s' -o chat cmd/chat/main.go
 RUN cp cmd/chat/.env .env
 CMD ["./chat"]

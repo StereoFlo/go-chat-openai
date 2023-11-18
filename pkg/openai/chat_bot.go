@@ -49,7 +49,7 @@ func (c *ChatBot) Ask(messages []openai.ChatCompletionMessage) (*string, error) 
 	c.wg.Add(1)
 	resp, err := c.getCompletionResponse(messages)
 	if err != nil {
-		return nil, errors.New("was an error")
+		return nil, errors.New(err.Error())
 	}
 
 	content := resp.Choices[0].Message.Content

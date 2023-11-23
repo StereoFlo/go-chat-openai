@@ -32,9 +32,6 @@ func NewMainService(
 
 func (ms *MainService) MessageHandler(update tgV5.Update) {
 	_, user := ms.userService.GetUserById(update.Message.From.ID)
-	if user.IsTokenLimitReached() {
-		ms.ClearHistoryHandler(update)
-	}
 	ms.userService.AddUserMessage(update.Message.From.ID, &update.Message.Text)
 	if user == nil {
 		_, user = ms.userService.GetUserById(update.Message.From.ID)
@@ -69,12 +66,7 @@ func (ms *MainService) HistoryHandler(update tgV5.Update) {
 
 func (ms *MainService) ClearHistoryHandler(update tgV5.Update) {
 	_, user := ms.userService.GetUserById(update.Message.From.ID)
-	var m string
-	if user.IsTokenLimitReached() {
-		m = "Max message size limit of AI is reached. Your chat history has been cleared. Your previous message was not delivered:\n\n" + update.Message.Text
-	} else {
-		m = "Message history completely cleared."
-	}
+	m := "Message history completely cleared."
 	ms.userService.ClearHistory(update.Message.From.ID)
 	ms.wg.Add(1)
 	go ms.tgBot.Send(update.Message.Chat.ID, &m, user)

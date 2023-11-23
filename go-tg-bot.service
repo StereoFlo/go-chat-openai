@@ -11,6 +11,7 @@ StandardError=journal
 Environment="TELEGRAM_API_KEY="
 Environment="OPENAI_API_KEY="
 Environment="WELCOME_MESSAGE="
+Environment="AI_MODEL="
 #
 SyslogIdentifier=go-chat-tg
 SyslogLevelPrefix=false

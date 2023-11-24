@@ -46,7 +46,6 @@ func NewChatBot(apiKey string, model string, wg *sync.WaitGroup) *ChatBot {
 }
 
 func (c *ChatBot) Ask(messages []openai.ChatCompletionMessage) (*string, error) {
-	c.wg.Add(1)
 	resp, err := c.getCompletionResponse(messages)
 	if err != nil {
 		return nil, errors.New("was an error on OpenAI side")

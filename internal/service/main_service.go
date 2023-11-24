@@ -8,6 +8,8 @@ import (
 	"sync"
 )
 
+const MaxMessageCharacters = 4096
+
 type MainService struct {
 	chatBot       *openai.ChatBot
 	chatBotApiKey string
@@ -43,8 +45,8 @@ func (ms *MainService) MessageHandler(update tgV5.Update) {
 		return
 	}
 	ms.userService.AddAiMessage(user.UserId, res)
-	if 4096 <= len(*res) { //todo make constant instead
-		messages := ms.splitString(*res, 4096)
+	if MaxMessageCharacters <= len(*res) { //todo make constant instead
+		messages := ms.splitString(*res, MaxMessageCharacters)
 		ms.wg.Add(1)
 		go ms.tgBot.SendMany(update.Message.Chat.ID, messages, user)
 		return

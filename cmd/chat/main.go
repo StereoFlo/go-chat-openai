@@ -20,7 +20,7 @@ func main() {
 	var wg sync.WaitGroup
 	users := make([]*entity.User, 0)
 	userService := service2.NewUserService(users)
-	chatBot := openai.NewChatBot(os.Getenv("OPENAI_API_KEY"), os.Getenv("AI_MODEL"), &wg)
+	chatBot := openai.NewChatBot(os.Getenv("OPENAI_API_KEY"), os.Getenv("AI_MODEL"))
 	tgBot := telegram.NewTelegramClient(os.Getenv("TELEGRAM_API_KEY"), os.Getenv("WELCOME_MESSAGE"), historyBtnLabel, clearHistoryBtnLabel, &wg)
 	service := service2.NewMainService(chatBot, tgBot, &wg, userService)
 	updates := tgBot.GetUpdates()

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/sashabaranov/go-openai"
-	"sync"
 )
 
 // Models
@@ -30,16 +29,14 @@ import (
 
 type ChatBot struct {
 	apiKey string
-	wg     *sync.WaitGroup
 	client *openai.Client
 	model  string
 }
 
-func NewChatBot(apiKey string, model string, wg *sync.WaitGroup) *ChatBot {
+func NewChatBot(apiKey string, model string) *ChatBot {
 	client := openai.NewClient(apiKey)
 	return &ChatBot{
 		apiKey: apiKey,
-		wg:     wg,
 		client: client,
 		model:  model,
 	}

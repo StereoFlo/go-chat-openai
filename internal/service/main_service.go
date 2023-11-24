@@ -89,24 +89,24 @@ func (ms *MainService) StartHandler(update tgV5.Update) {
 	go ms.tgBot.Send(update.Message.Chat.ID, res, nil)
 }
 
-func (ms *MainService) splitString(s string, chunkSize int) []string {
-	if len(s) == 0 {
+func (ms *MainService) splitString(inputString string, chunkSize int) []string {
+	if len(inputString) == 0 {
 		return nil
 	}
-	if chunkSize >= len(s) {
-		return []string{s}
+	if chunkSize >= len(inputString) {
+		return []string{inputString}
 	}
-	var chunks = make([]string, 0, (len(s)-1)/chunkSize+1)
+	var chunks = make([]string, 0, (len(inputString)-1)/chunkSize+1)
 	currentLen := 0
 	currentStart := 0
-	for i := range s {
+	for i := range inputString {
 		if currentLen == chunkSize {
-			chunks = append(chunks, s[currentStart:i])
+			chunks = append(chunks, inputString[currentStart:i])
 			currentLen = 0
 			currentStart = i
 		}
 		currentLen++
 	}
-	chunks = append(chunks, s[currentStart:])
+	chunks = append(chunks, inputString[currentStart:])
 	return chunks
 }

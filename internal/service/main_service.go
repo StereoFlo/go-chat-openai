@@ -5,7 +5,6 @@ import (
 	tgV5 "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go-chat-tg/pkg/openai"
 	"go-chat-tg/pkg/telegram"
-	"log"
 	"sync"
 )
 
@@ -41,7 +40,7 @@ func (ms *MainService) MessageHandler(update tgV5.Update) {
 		errStr := err.Error()
 		ms.wg.Add(1)
 		go ms.tgBot.Send(update.Message.Chat.ID, &errStr, user)
-		log.Fatal(err)
+		return
 	}
 	ms.userService.AddAiMessage(user.UserId, res)
 	if 4096 <= len(*res) { //todo make constant instead
@@ -78,7 +77,10 @@ func (ms *MainService) StartHandler(update tgV5.Update) {
 	ms.userService.AddUserMessage(update.Message.From.ID, &m)
 	res, err := ms.chatBot.Ask(user.Messages)
 	if err != nil {
-		log.Fatal(err)
+		errMsg := err.Error()
+		ms.wg.Add(1)
+		go ms.tgBot.Send(update.Message.Chat.ID, &errMsg, nil)
+		return
 	}
 	user.Messages = nil
 	ms.wg.Add(1)

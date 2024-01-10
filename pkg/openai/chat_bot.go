@@ -2,7 +2,6 @@ package openai
 
 import (
 	"context"
-	"errors"
 	"github.com/sashabaranov/go-openai"
 	"sync"
 )
@@ -49,7 +48,7 @@ func (c *ChatBot) Ask(messages []openai.ChatCompletionMessage) (*string, error) 
 	c.wg.Add(1)
 	resp, err := c.getCompletionResponse(messages)
 	if err != nil {
-		return nil, errors.New("was an error on OpenAI side")
+		return nil, err
 	}
 
 	content := resp.Choices[0].Message.Content

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	tgV5 "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go-chat-tg/internal/entity"
@@ -42,7 +43,7 @@ func (ms *MainService) MessageHandler(update tgV5.Update) {
 	}
 	res, err := ms.chatBot.Ask(user.Messages)
 	if err != nil {
-		ms.sendMessageErrorHandler(update, err, user)
+		ms.sendMessageErrorHandler(update, err, user, nil)
 		return
 	}
 	ms.userService.AddAiMessage(user.UserId, res)
@@ -54,7 +55,7 @@ func (ms *MainService) MessageHandler(update tgV5.Update) {
 	}
 	err = ms.tgBot.Send(update.Message.Chat.ID, res, user)
 	if err != nil {
-		ms.sendMessageErrorHandler(update, err, user)
+		ms.sendMessageErrorHandler(update, err, user, res)
 	}
 }
 
@@ -66,7 +67,7 @@ func (ms *MainService) HistoryHandler(update tgV5.Update) {
 	_, user := ms.userService.GetUserById(update.Message.From.ID)
 	err := ms.tgBot.Send(update.Message.Chat.ID, &history, user)
 	if err != nil {
-		ms.sendMessageErrorHandler(update, err, user)
+		ms.sendMessageErrorHandler(update, err, user, nil)
 	}
 }
 
@@ -81,7 +82,7 @@ func (ms *MainService) ClearHistoryHandler(update tgV5.Update) {
 	ms.userService.ClearHistory(update.Message.From.ID)
 	err := ms.tgBot.Send(update.Message.Chat.ID, &m, user)
 	if err != nil {
-		ms.sendMessageErrorHandler(update, err, user)
+		ms.sendMessageErrorHandler(update, err, user, nil)
 	}
 }
 
@@ -96,7 +97,7 @@ func (ms *MainService) StartHandler(update tgV5.Update) {
 	user.Messages = nil
 	err = ms.tgBot.Send(update.Message.Chat.ID, res, nil)
 	if err != nil {
-		ms.sendMessageErrorHandler(update, err, user)
+		ms.sendMessageErrorHandler(update, err, user, nil)
 	}
 }
 
@@ -122,11 +123,14 @@ func (ms *MainService) splitString(str string, chunkSize int) []string {
 	return chunks
 }
 
-func (ms *MainService) sendMessageErrorHandler(update tgV5.Update, err error, user *entity.User) {
+func (ms *MainService) sendMessageErrorHandler(update tgV5.Update, err error, user *entity.User, botRes *string) {
 	log.Print(err)
 	errMsg := "Sorry, service temporarily unavailable. Please try again later."
 	err = ms.tgBot.Send(update.Message.Chat.ID, &errMsg, user)
 	if err != nil {
+		if botRes != nil {
+			log.Print(errors.New(*botRes))
+		}
 		log.Print(err)
 	}
 }
